@@ -71,8 +71,8 @@ const BASE_URL = isProduction
   ? process.env.UMI_APP_API_URL || ""
   : "http://localhost:5000";
 
-// Tự động kẹp thêm tiền tố /api nếu chuỗi gốc chưa có
-const API_URL = BASE_URL.endsWith("/api") ? BASE_URL : `${BASE_URL}/api`;
+// Tự động kẹp thêm tiền tố /api/kèm trailing slash để umi-request nối chuẩn
+const API_URL = (BASE_URL.endsWith("/api") ? BASE_URL : `${BASE_URL}/api`) + "/";
 
 export const request = {
   timeout: 30000,

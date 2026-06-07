@@ -4,7 +4,7 @@ import type { RequestOptions } from "umi";
 const BASE_URL =
   process.env.NODE_ENV === "production"
     ? process.env.UMI_APP_API_URL || ""
-    : "";
+    : "http://localhost:5000";
 
 export const getAuthHeader = (): Record<string, string> => {
   const token = localStorage.getItem("token");
