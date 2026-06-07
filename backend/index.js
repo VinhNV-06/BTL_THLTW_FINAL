@@ -76,6 +76,10 @@ app.use("/api/student", require("./routes/student.routes"));
 app.use("/api/thesis", require("./routes/thesis.routes"));
 app.use("/api/milestones", require("./routes/milestone.routes"));
 app.use("/api/submissions", require("./routes/submission.routes"));
+// 🔥 TƯƠNG THÍCH NGƯỢC: Một số phiên bản Frontend cũ (và FE Netlify hiện tại)
+// vẫn đang gọi đường dẫn SINGULAR "/api/submission". Mount thêm route này
+// trỏ về cùng bộ controller để tránh 404 — KHÔNG ảnh hưởng tới role admin/lecturer.
+app.use("/api/submission", require("./routes/submission.routes"));
 app.use("/api/progress", require("./routes/progress.routes"));
 
 app.use("/api/topics", require("./routes/topic.routes"));

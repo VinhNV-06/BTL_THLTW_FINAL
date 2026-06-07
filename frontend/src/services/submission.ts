@@ -47,7 +47,7 @@ export const getSubmissionsByMilestone = async (
   thesisId: number,
 ): Promise<ApiResponse<ISubmission[]>> => {
   // Thay thế request bằng apiRequest để tự động kẹp Token và nhận diện URL môi trường Netlify
-  return apiRequest<ApiResponse<ISubmission[]>>(`/api/submission`, {
+  return apiRequest<ApiResponse<ISubmission[]>>(`/api/submissions`, {
     method: "GET",
     params: {
       milestone_id: milestoneId,
@@ -62,7 +62,7 @@ export const getSubmissionsByMilestone = async (
 export const submitMilestone = async (
   payload: FormData,
 ): Promise<ApiResponse<ISubmission>> => {
-  return apiRequest<ApiResponse<ISubmission>>("/api/submission", {
+  return apiRequest<ApiResponse<ISubmission>>("/api/submissions", {
     method: "POST",
     data: payload,
     headers: {

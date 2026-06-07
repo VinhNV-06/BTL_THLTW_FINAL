@@ -37,7 +37,7 @@ export const updateStudentProfile = async (
   data: ProfileUpdatePayload,
 ): Promise<unknown> => {
   return apiRequest("/api/student/profile", {
-    value: "PUT",
+    method: "PUT",
     data,
   });
 };

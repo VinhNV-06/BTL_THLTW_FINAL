@@ -24,9 +24,22 @@ const StudentNotifications: React.FC = () => {
     try {
       setLoading(true);
       const res = await getMyNotifications();
-      if (res && Array.isArray(res)) {
-        setNotifications(sortNewestFirst(res as NotificationItem[]));
+
+      // Bộ phòng thủ 2 lớp: backend có thể trả về array trực tiếp
+      // HOẶC object bọc { data: [...] } tuỳ phiên bản.
+      let list: NotificationItem[] = [];
+      if (Array.isArray(res)) {
+        list = res as NotificationItem[];
+      } else if (
+        res &&
+        typeof res === "object" &&
+        "data" in res &&
+        Array.isArray((res as { data: unknown }).data)
+      ) {
+        list = ((res as { data: NotificationItem[] }).data) || [];
       }
+
+      setNotifications(sortNewestFirst(list));
     } catch (error: unknown) {
       console.error("Failed to fetch student notifications:", error);
       void message.error("Lỗi khi tải thông báo từ hệ thống");
