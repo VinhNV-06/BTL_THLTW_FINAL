@@ -23,12 +23,24 @@ const getStudentDashboard = async (studentId) => {
       ORDER BY t.created_at DESC
     `);
 
-  // Nếu sinh viên chưa có đề tài
-  if (result.recordset.length === 0) {
+  // Nếu sinh viên chưa có đề tài (thesisId = null hoặc recordset rỗng)
+  if (result.recordset.length === 0 || !result.recordset[0].thesisId) {
+    const advisorResult = await pool.request()
+      .input("studentId", sql.Int, studentId)
+      .query(`
+        SELECT TOP 1 u.name AS advisorName
+        FROM ClassStudents cs
+        INNER JOIN Classes c ON cs.class_id = c.id
+        INNER JOIN Users u ON c.lecturer_id = u.id
+        WHERE cs.student_id = @studentId
+      `);
+
+    const advisorName = advisorResult.recordset.length > 0 ? advisorResult.recordset[0].advisorName : null;
+
     return {
       thesisId: null, 
       thesisTitle: null,
-      advisorName: null,
+      advisorName: advisorName,
       status: "not_registered",
       systemMessage: "Bạn chưa đăng ký đề tài khóa luận. Vui lòng vào mục đăng ký.",
       supportEmail: "support@ptit.edu.vn"
