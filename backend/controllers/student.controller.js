@@ -10,7 +10,7 @@ const getStudentDashboard = async (req, res) => {
   }
   try {
     const data = await studentService.getStudentDashboard(req.user.id);
-    res.json(data);
+    res.json({ success: true, data });
   } catch (err) {
     res.status(500).json({ message: "Lỗi lấy dữ liệu Dashboard", error: err.message });
   }
