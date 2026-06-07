@@ -71,6 +71,10 @@ exports.updateProposal = async (id, data, lecturerId) => {
   const { title, description, max_groups, status, session_id } = data;
   const pool = await poolPromise;
 
+  if (title !== undefined && (title === null || (typeof title === "string" && title.trim() === ""))) {
+    throw new Error("Tiêu đề đề xuất không được để trống.");
+  }
+
   const ownerCheck = await pool
     .request()
     .input("id", sql.Int, id)

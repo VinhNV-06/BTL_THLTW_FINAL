@@ -172,12 +172,18 @@ const MyProposals: React.FC = () => {
   };
 
   const handleSubmit = async (values: FormValues): Promise<void> => {
+    const payload = {
+      ...values,
+      title: values.title?.trim(),
+      description: values.description?.trim() || undefined,
+    };
+
     try {
       if (editingId) {
-        await updateProposal(editingId, values);
+        await updateProposal(editingId, payload);
         void message.success("Đã cập nhật đề tài đề xuất");
       } else {
-        await createProposal(values);
+        await createProposal(payload);
         void message.success("Đã đăng đề tài đề xuất mới");
       }
       setIsModalOpen(false);
@@ -355,7 +361,9 @@ const MyProposals: React.FC = () => {
           <Form.Item
             name="title"
             label="Tên đề tài"
-            rules={[{ required: true, message: "Vui lòng nhập tên đề tài" }]}
+            rules={[
+              { required: true, whitespace: true, message: "Vui lòng nhập tên đề tài" },
+            ]}
           >
             <Input placeholder="Ví dụ: Hệ thống quản lý đồ án tốt nghiệp" />
           </Form.Item>
