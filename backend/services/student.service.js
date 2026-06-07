@@ -130,10 +130,15 @@ const updateProfile = async (userId, data) => {
       .input("userId", sql.Int, userId)
       .input("phone", sql.NVarChar, phone || null)
       .query(`
-        -- Đã sửa: Update vào bảng UserProfiles thay vì Users
-        UPDATE UserProfiles 
-        SET phone = @phone, updated_at = GETDATE() 
-        WHERE user_id = @userId
+        -- Đã sửa: Dùng MERGE để tự động INSERT nếu chưa có bản ghi profile hoặc UPDATE nếu đã có
+        MERGE UserProfiles AS target
+        USING (SELECT @userId AS user_id) AS source
+        ON (target.user_id = source.user_id)
+        WHEN MATCHED THEN
+            UPDATE SET phone = @phone, updated_at = GETDATE()
+        WHEN NOT MATCHED THEN
+            INSERT (user_id, phone, updated_at)
+            VALUES (@userId, @phone, GETDATE());
       `);
   } catch (err) {
     

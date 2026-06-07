@@ -50,11 +50,6 @@ const createThesis = async (req, res) => {
       .status(400)
       .json({ message: "Thiếu thông tin giảng viên hướng dẫn (lecturer_id)!" });
   }
-  if (!session_id) {
-    return res
-      .status(400)
-      .json({ message: "Thiếu thông tin đợt đăng ký (session_id)!" });
-  }
 
   try {
     const payload = {

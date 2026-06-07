@@ -114,18 +114,14 @@ const SubmissionPage: React.FC = () => {
       setIsSubmitting(true);
       const primaryFile = fileList[0].originFileObj;
 
-      const uploadedUrl = `/uploads/thesis${thesisId}/std${studentId}_${primaryFile.name}`;
+      const formData = new FormData();
+      formData.append("file", primaryFile);
+      formData.append("milestoneId", String(milestoneId));
+      formData.append("thesisId", String(thesisId));
+      formData.append("studentId", String(studentId));
+      formData.append("note", "Sinh viên nộp báo cáo qua hệ thống Workspace");
 
-      const payload = {
-        milestone_id: milestoneId,
-        thesis_id: thesisId,
-        student_id: studentId,
-        file_name: primaryFile.name,
-        file_url: uploadedUrl,
-        note: "Sinh viên nộp báo cáo qua hệ thống Workspace",
-      };
-
-      const res = await submitMilestone(payload);
+      const res = await submitMilestone(formData);
       if (res) {
         void messageApi.success("Nộp bài thành công!");
         setFileList([]);

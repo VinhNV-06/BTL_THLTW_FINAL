@@ -60,10 +60,13 @@ export const getSubmissionsByMilestone = async (
  * Sinh viên thực hiện nộp tệp tin/báo cáo minh chứng cho mốc thời gian (Milestone)
  */
 export const submitMilestone = async (
-  payload: SubmitPayload,
+  payload: FormData,
 ): Promise<ApiResponse<ISubmission>> => {
   return apiRequest<ApiResponse<ISubmission>>("/api/submission", {
     method: "POST",
     data: payload,
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
   });
 };

@@ -1,4 +1,4 @@
-import { history } from "umi";
+import { history, useModel } from "umi";
 import { Button, Popconfirm, App, Badge, Tooltip } from "antd";
 import { LogoutOutlined, BellOutlined } from "@ant-design/icons";
 import React, { useEffect, useState } from "react";
@@ -97,6 +97,8 @@ export const request = {
 };
 
 const NotificationIndicator: React.FC = () => {
+  const { initialState } = useModel("@@initialState");
+  const role = initialState?.currentUser?.role;
   const [count, setCount] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -142,7 +144,13 @@ const NotificationIndicator: React.FC = () => {
           shape="circle"
           icon={<BellOutlined />}
           loading={loading}
-          onClick={() => history.push("/lecturer/notifications")}
+          onClick={() => {
+            if (role === "student") {
+              history.push("/student/notifications");
+            } else {
+              history.push("/lecturer/notifications");
+            }
+          }}
         />
       </Badge>
     </Tooltip>
@@ -171,7 +179,7 @@ export const layout = ({
           paddingRight: "16px",
         }}
       >
-        {initialState?.currentUser?.role === "lecturer" && (
+        {(initialState?.currentUser?.role === "lecturer" || initialState?.currentUser?.role === "student") && (
           <NotificationIndicator />
         )}
         <span style={{ color: "rgba(0, 0, 0, 0.85)", fontWeight: 500 }}>
