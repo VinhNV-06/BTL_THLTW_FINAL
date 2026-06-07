@@ -60,10 +60,25 @@ const getStudentDashboard = async (studentId) => {
   }
 
   const data = result.recordset[0];
+  // If advisorName is null (lecturer not assigned yet), fetch from class
+  let advisorName = data.advisorName;
+  if (!advisorName) {
+    const advisorResult = await pool
+      .request()
+      .input("studentId", sql.Int, studentId)
+      .query(`
+        SELECT TOP 1 u.name AS advisorName
+        FROM ClassStudents cs
+        INNER JOIN Classes c ON cs.class_id = c.id
+        INNER JOIN Users u ON c.lecturer_id = u.id
+        WHERE cs.student_id = @studentId
+      `);
+    advisorName = advisorResult.recordset[0]?.advisorName || null;
+  }
   return {
     thesisId: data.thesisId,
     thesisTitle: data.thesisTitle,
-    advisorName: data.advisorName || "Đang chờ phân công",
+    advisorName: advisorName || "Đang chờ phân công",
     status: data.status,
     systemMessage: "Chào mừng bạn quay lại hệ thống Workspace!",
     supportEmail: "support@ptit.edu.vn",
