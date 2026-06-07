@@ -47,10 +47,12 @@ const getStudentDashboard = async (studentId) => {
         WHERE cs.student_id = @studentId
       `);
 
+    const advisorName = advisorResult.recordset[0]?.advisorName || null;
+
     return {
       thesisId: null,
       thesisTitle: null,
-      advisorName: advisorResult.recordset[0]?.advisorName || null,
+      advisorName: advisorName,
       status: "not_registered",
       systemMessage: "Bạn chưa đăng ký đề tài khóa luận. Vui lòng vào mục đăng ký.",
       supportEmail: "support@ptit.edu.vn",
