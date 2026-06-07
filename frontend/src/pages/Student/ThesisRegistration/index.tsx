@@ -117,7 +117,7 @@ const ThesisRegistrationPage: React.FC = () => {
         let actualStatus: ThesisStatus = "not_registered";
         if (token) {
           try {
-            const dashboardRes = (await request("/api/student/dashboard", {
+            const dashboardRes = (await request("student/dashboard", {
               method: "GET",
               headers: { Authorization: `Bearer ${token}` },
             })) as DashboardApiResponse;

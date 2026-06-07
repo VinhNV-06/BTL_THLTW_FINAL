@@ -20,6 +20,8 @@ const getStudentDashboard = async (studentId) => {
       FROM Thesis t
       LEFT JOIN Users u ON t.lecturer_id = u.id
       WHERE t.student_id = @studentId
+        AND (t.status IS NULL OR t.status <> 'forum')
+        AND t.title NOT LIKE 'DIEN_DAN_CHUNG_LOP_%'
       ORDER BY t.created_at DESC
     `);
 
@@ -76,10 +78,15 @@ const getProfile = async (userId) => {
       t.title AS thesis_title,
       l.name AS lecturer_name
     FROM Users u
-    LEFT JOIN UserProfiles up ON u.id = up.user_id -- Đã sửa: JOIN với bảng UserProfiles
+    LEFT JOIN UserProfiles up ON u.id = up.user_id
     LEFT JOIN ClassStudents cs ON u.id = cs.student_id
     LEFT JOIN Classes c ON cs.class_id = c.id
-    LEFT JOIN Thesis t ON u.id = t.student_id
+    LEFT JOIN (
+      SELECT id, student_id, lecturer_id, title, created_at
+      FROM Thesis
+      WHERE (status IS NULL OR status <> 'forum')
+        AND title NOT LIKE 'DIEN_DAN_CHUNG_LOP_%'
+    ) t ON u.id = t.student_id
     LEFT JOIN Users l ON t.lecturer_id = l.id
     WHERE u.id = @userId AND u.role = 'student'
   `);

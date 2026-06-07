@@ -125,7 +125,9 @@ const priorityConfig: Record<string, { color: string; label: string }> = {
 const getDerivedProgress = (status: MilestoneStatus): number =>
   status === "completed" ? 100 : 0;
 
-const API_BASE = process.env.REACT_APP_API_URL || "";
+const API_BASE =
+  (typeof process !== "undefined" && process.env && process.env.UMI_APP_API_URL) ||
+  "http://localhost:5000";
 
 // ==========================================
 // 1. Component TaskCard
@@ -684,7 +686,7 @@ const ProgressReportSection: React.FC<ProgressReportSectionProps> = ({
   ): Promise<void> => {
     try {
       const token = localStorage.getItem("token");
-      await request(`/api/progress/submissions/${submissionId}`, {
+      await request(`progress/submissions/${submissionId}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -880,7 +882,7 @@ const ProgressReportSection: React.FC<ProgressReportSectionProps> = ({
                             href={
                               item.file_url?.startsWith("http")
                                 ? item.file_url
-                                : `${process.env.REACT_APP_API_URL || "http://localhost:5000"}${item.file_url}`
+                                : `${API_BASE}${item.file_url}`
                             }
                             target="_blank"
                             rel="noreferrer"
@@ -1020,7 +1022,7 @@ const Progress: React.FC = () => {
         setLoadingInitial(true);
         const token = localStorage.getItem("token");
 
-        const dashRes = (await request("/api/student/dashboard", {
+        const dashRes = (await request("student/dashboard", {
           method: "GET",
           headers: { Authorization: `Bearer ${token}` },
         })) as DashboardApiResponse;
@@ -1034,7 +1036,7 @@ const Progress: React.FC = () => {
           setRealThesisId(fetchedThesisId);
 
           const milestonesRes = (await request(
-            `/api/progress/milestones/${fetchedThesisId}`,
+            `progress/milestones/${fetchedThesisId}`,
             {
               method: "GET",
               headers: { Authorization: `Bearer ${token}` },
