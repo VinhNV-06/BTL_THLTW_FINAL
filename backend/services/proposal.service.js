@@ -46,6 +46,11 @@ exports.createProposal = async (data) => {
     throw new Error("Không tìm thấy đợt đăng ký nào đang hoạt động. Vui lòng liên hệ Admin!");
   }
 
+  // Validate required fields to avoid DB NOT NULL constraint errors
+  if (!title || (typeof title === "string" && title.trim() === "")) {
+    throw new Error("Thiếu tiêu đề đề xuất (title)! Vui lòng nhập tiêu đề.");
+  }
+
   const result = await pool
     .request()
     .input("session_id", sql.Int, session_id)
