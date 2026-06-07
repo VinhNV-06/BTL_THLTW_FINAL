@@ -30,11 +30,20 @@ exports.getMyProposals = async (lecturerId) => {
 };
 
 exports.createProposal = async (data) => {
-  const { session_id, lecturer_id, title, description, max_groups, status } = data;
+  const { lecturer_id, title, description, max_groups, status } = data;
+  let { session_id } = data;
   const pool = await poolPromise;
 
+  // Nếu không có session_id → tự động lấy session đang active
   if (!session_id) {
-    throw new Error("Thiếu thông tin đợt đăng ký (session_id)!");
+    const sessionRes = await pool
+      .request()
+      .query("SELECT TOP 1 id FROM Sessions WHERE is_active = 1 ORDER BY created_at DESC");
+    session_id = sessionRes.recordset[0]?.id || null;
+  }
+
+  if (!session_id) {
+    throw new Error("Không tìm thấy đợt đăng ký nào đang hoạt động. Vui lòng liên hệ Admin!");
   }
 
   const result = await pool
