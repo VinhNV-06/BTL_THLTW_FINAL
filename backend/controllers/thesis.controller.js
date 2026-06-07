@@ -181,27 +181,52 @@ const updateThesisReviewStatus = async (req, res) => {
       ip_address: req.ip,
     });
 
-    // 🔔 Send notification to lecturer when thesis is approved or rejected
+    // 🔔 Gửi thông báo cho Giảng viên
     if (admin_status && data.lecturer_id) {
-      const notificationTitle =
+      const lecturerTitle =
         admin_status === "approved"
-          ? `Đề tài "${data.title}" đã được phê duyệt`
-          : `Đề tài "${data.title}" đã bị từ chối`;
+          ? `Đề tài "${data.title}" đã được Admin phê duyệt`
+          : `Đề tài "${data.title}" đã bị Admin từ chối`;
 
-      const notificationMessage =
+      const lecturerMessage =
         admin_status === "approved"
-          ? `Đề tài của bạn "${data.title}" đã được Admin phê duyệt thành công. Bạn có thể bắt đầu hướng dẫn sinh viên.`
-          : `Đề tài của bạn "${data.title}" đã bị từ chối. Lý do: ${reject_reason || "Không có"}`;
+          ? `Đề tài "${data.title}" đã được Admin phê duyệt thành công. Bạn có thể bắt đầu hướng dẫn sinh viên.`
+          : `Đề tài "${data.title}" đã bị từ chối. Lý do: ${reject_reason || "Không có"}`;
 
       await notificationService.createNotification({
         user_id: data.lecturer_id,
-        type:
-          admin_status === "approved" ? "thesis_approved" : "thesis_rejected",
-        title: notificationTitle,
-        message: notificationMessage,
+        type: admin_status === "approved" ? "thesis_approved" : "thesis_rejected",
+        title: lecturerTitle,
+        message: lecturerMessage,
         ref_type: "Thesis",
         ref_id: id,
       });
+    }
+
+    // 🔔 Gửi thông báo cho Sinh viên
+    if (admin_status && data.student_id) {
+      const studentTitle =
+        admin_status === "approved"
+          ? `Đề tài của bạn đã được duyệt!`
+          : `Đề tài của bạn đã bị từ chối`;
+
+      const studentMessage =
+        admin_status === "approved"
+          ? `Đề tài "${data.title}" đã được Admin phê duyệt. Hãy kiểm tra mục Tiến độ để bắt đầu nộp bài.`
+          : `Đề tài "${data.title}" đã bị từ chối. Lý do: ${reject_reason || "Không có"}. Bạn có thể đăng ký lại.`;
+
+      try {
+        await notificationService.createNotification({
+          user_id: data.student_id,
+          type: admin_status === "approved" ? "thesis_approved" : "thesis_rejected",
+          title: studentTitle,
+          message: studentMessage,
+          ref_type: "Thesis",
+          ref_id: id,
+        });
+      } catch (notifyErr) {
+        console.error("Lỗi gửi thông báo cho sinh viên:", notifyErr.message);
+      }
     }
 
     res.json({ message: "Cập nhật trạng thái duyệt thành công!", data });

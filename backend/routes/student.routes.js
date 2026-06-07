@@ -15,6 +15,9 @@ router.get("/dashboard", studentController.getStudentDashboard);
 router.get("/profile", studentController.getProfile);
 router.put("/profile", studentController.updateProfile);
 
+// 3. MY THESIS - Lấy đề tài + milestones của sinh viên hiện tại
+router.get("/my-thesis", studentController.getMyThesis);
+
 // 3. MILESTONES
 router.get("/theses/:thesisId/milestones", progressController.getMilestones);
 router.post("/milestones", progressController.createMilestone);
