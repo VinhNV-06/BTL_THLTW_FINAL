@@ -116,7 +116,7 @@ exports.createSubmission = async (data, file) => {
   let fileSize = data.file_size || data.fileSize || 0;
 
   if (file) {
-    fileUrl = file.path.replace(/\\/g, "/");
+    fileUrl = `uploads/${file.filename}`;
     fileName = file.originalname;
     fileSize = file.size;
   }
@@ -158,9 +158,13 @@ exports.deleteSubmission = async (id) => {
 
   const { file_url } = existing.recordset[0];
   
-  
-  if (file_url && !file_url.startsWith("http") && fs.existsSync(file_url)) {
-    fs.unlinkSync(file_url);
+  if (file_url && !file_url.startsWith("http")) {
+    const resolvedPath = file_url.startsWith("uploads/")
+      ? file_url.replace("uploads/", "public/uploads/")
+      : file_url;
+    if (fs.existsSync(resolvedPath)) {
+      fs.unlinkSync(resolvedPath);
+    }
   }
 
   await pool

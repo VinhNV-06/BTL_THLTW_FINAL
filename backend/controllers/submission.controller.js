@@ -141,7 +141,10 @@ exports.downloadFile = async (req, res) => {
       return res.status(404).json({ message: "Không tìm thấy submission" });
     }
 
-    const filePath = path.join(__dirname, "../../", submission.file_url);
+    const resolvedPath = submission.file_url.startsWith("uploads/")
+      ? submission.file_url.replace("uploads/", "public/uploads/")
+      : submission.file_url;
+    const filePath = path.join(__dirname, "../../", resolvedPath);
     if (!fs.existsSync(filePath)) {
       return res.status(404).json({ message: "File không còn tồn tại trên server" });
     }
