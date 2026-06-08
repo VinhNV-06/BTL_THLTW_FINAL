@@ -169,11 +169,12 @@ exports.getThesisDetail = async (req, res) => {
 };
 
 exports.createMilestone = async (req, res) => {
-  const { thesis_id } = req.body;
+  const rawThesisId = req.body.thesis_id ?? req.body.thesisId;
+  const thesis_id = parseInt(rawThesisId, 10);
   const lecturerId = req.user?.id;
 
-  if (!thesis_id) {
-    return res.status(400).json({ message: "Thiếu thesis_id" });
+  if (!rawThesisId || isNaN(thesis_id) || thesis_id <= 0) {
+    return res.status(400).json({ message: "Thiếu hoặc sai định dạng thesis_id. Vui lòng chọn đề tài hợp lệ!" });
   }
 
   const isOwner = await lecturerThesisService.verifyThesisOwnership(thesis_id, lecturerId);
@@ -182,7 +183,8 @@ exports.createMilestone = async (req, res) => {
   }
 
   try {
-    const data = await milestoneService.createMilestone(req.body);
+    const payload = { ...req.body, thesis_id, created_by: lecturerId };
+    const data = await milestoneService.createMilestone(payload);
 
     await lecturerService.logAudit({
       actor_id: lecturerId,
@@ -190,7 +192,7 @@ exports.createMilestone = async (req, res) => {
       action: "CREATE_MILESTONE",
       target_table: "Milestones",
       target_id: data?.id,
-      new_value: req.body
+      new_value: payload
     });
 
     res.status(201).json(data);
